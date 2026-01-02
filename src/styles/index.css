@@ -1,6 +1,11 @@
 #music {
-    visibility: hidden;
     position: absolute;
+    visibility: hidden;
+    bottom: 0;
+}
+
+#play {
+    position: relative;
 }
 
 #bar {
