@@ -24,6 +24,9 @@
 }
 
 .frame-container {
+    @supports (-moz-appearance: none) {
+        display: none;
+    }
     & span {
         pointer-events: none;
     }
