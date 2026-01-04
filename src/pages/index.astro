@@ -4,29 +4,36 @@ import "../styles/index.css"
 ---
 
 <Layout>
-    <button id="play">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-            <path
-                d="M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z"
-            ></path>
-        </svg>
-    </button>
-    <section id="bar">
+    <section id="guesses">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span class="correct">The Correct Answer - Queen</span>
+    </section>
+    <div>
+        <button id="play">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path
+                    d="M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Z"
+                ></path>
+            </svg>
+        </button>
         <div id="bars">
             <div></div>
             <div></div>
             <div></div>
 
-            <div id="available"><div id="played"></div></div>
+            <div id="available"></div>
+            <div id="played"></div>
         </div>
-    </section>
-    <button id="skip">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
-            ><path
-                d="M660-280v-400q0-17 11.5-28.5T700-720q17 0 28.5 11.5T740-680v400q0 17-11.5 28.5T700-240q-17 0-28.5-11.5T660-280Zm-440-35v-330q0-18 12-29t28-11q5 0 11 1t11 5l248 166q9 6 13.5 14.5T548-480q0 10-4.5 18.5T530-447L282-281q-5 4-11 5t-11 1q-16 0-28-11t-12-29Z"
-            ></path></svg
-        >
-    </button>
+        <button id="skip">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
+                ><path
+                    d="M660-280v-400q0-17 11.5-28.5T700-720q17 0 28.5 11.5T740-680v400q0 17-11.5 28.5T700-240q-17 0-28.5-11.5T660-280Zm-440-35v-330q0-18 12-29t28-11q5 0 11 1t11 5l248 166q9 6 13.5 14.5T548-480q0 10-4.5 18.5T530-447L282-281q-5 4-11 5t-11 1q-16 0-28-11t-12-29Z"
+                ></path></svg
+            >
+        </button>
+    </div>
 </Layout>
 
 <script>
@@ -37,13 +44,12 @@ import "../styles/index.css"
     await auth.init({
         clientId: "NkcXqihOmrfZdBla",
         clientSecret: "e6ldlWH48BEBOUZV1uIyIWJOf1KUGUEeH6qHkFvNjeU=",
-        credentialsStorageKey: "key",
+        credentialsStorageKey: "ZvZbtTWzx5@1zfiWUluxWD9@di17e1da",
     })
 
     player.setCredentialsProvider(auth.credentialsProvider)
     player.setEventSender(eventProducer)
 
-    // TODO: Use css anim for progress
     class ExtendableTimeout {
         private timerId: ReturnType<typeof setTimeout>
         private timeStart: number
@@ -70,28 +76,31 @@ import "../styles/index.css"
     }
 
     const play = document.querySelector("#play")
+    const played = document.querySelector("#played")
     const skip = document.querySelector("#skip")
-    const available = document.querySelector("#available") as HTMLDivElement
+    const available = document.querySelector("#available")
 
     let phase = 1
     let timer: ExtendableTimeout | null
 
-    const getTimeout = () => 2 ** phase * 1000
+    const getTimeout = (phase: number) => (2 ** phase - 1) * 1000
 
     const playVideo = async () => {
         await player.load({
-            productId: "3188631",
+            productId: "36737274",
             productType: "track",
-            sourceId: "3188629",
-            sourceType: "ALBUM",
+            sourceId: "",
+            sourceType: "",
         })
-        player.play()
+        await player.play()
+        played?.classList.add("playing")
 
         timer?.cancel()
         timer = new ExtendableTimeout(() => {
             player.pause()
             timer = null
-        }, getTimeout())
+            played?.classList.remove("playing")
+        }, getTimeout(phase))
     }
 
     play?.addEventListener("click", playVideo)
@@ -100,13 +109,13 @@ import "../styles/index.css"
         if (phase >= 4) return alert("FAIL!!!!")
         phase += 1
 
-        //@ts-expect-error
+        // @ts-expect-error
         available.style["grid-column-end"] = phase + 1
 
         if (timer == null) {
             playVideo()
         } else {
-            timer.extend(getTimeout())
+            timer.extend(getTimeout(phase))
         }
     })
 </script>
